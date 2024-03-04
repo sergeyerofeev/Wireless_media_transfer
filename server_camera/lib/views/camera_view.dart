@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:socket_io/socket_io.dart';
 
-import '../helpers/constants.dart';
+import '../settings/constraints.dart';
 
 class CameraView extends StatefulWidget {
   const CameraView({super.key});
@@ -17,7 +17,7 @@ class CameraViewState extends State<CameraView> {
   final RTCVideoRenderer _localVideoRenderer = RTCVideoRenderer();
   late final RTCPeerConnection _localPc;
 
-  late final Server _socketServer;
+  late final Server _server;
   Socket? _socket;
 
   //--------------------------------------------------------------------------//
@@ -35,11 +35,6 @@ class CameraViewState extends State<CameraView> {
   }
 
   //--------------------------------------------------------------------------//
-  void update() {
-    if (mounted) setState(() {});
-  }
-
-  //--------------------------------------------------------------------------//
   Future<void> _init() async {
     await _makeWebRTC();
     await _startSocketHandler();
@@ -49,30 +44,23 @@ class CameraViewState extends State<CameraView> {
   Future<void> _makeWebRTC() async {
     await _localVideoRenderer.initialize();
 
-    _localPc = await createPeerConnection(configuration, constraints);
+    _localPc = await createPeerConnection(configuration, peerConnectionConstraints);
     _localPc.onIceConnectionState = (RTCIceConnectionState state) {
       switch (state) {
         case RTCIceConnectionState.RTCIceConnectionStateFailed:
           _localPc.restartIce();
           return;
         case RTCIceConnectionState.RTCIceConnectionStateDisconnected:
+          // Здесь обрабатываем событие - собеседник вышел из приложения
           return;
         default:
           return;
       }
     };
-    _localPc.onConnectionState = (RTCPeerConnectionState state) async {
-      switch (state) {
-        case RTCPeerConnectionState.RTCPeerConnectionStateConnected:
-          update();
-          break;
-        default:
-          return;
-      }
-    };
+
     _localPc.onIceCandidate = (RTCIceCandidate candidate) async {
       await Future.delayed(const Duration(milliseconds: 1000), () {
-        _sendSocket("signal", "candidate", {
+        _sendSocket(_socket, 'signal', 'candidate', {
           'sdpMLineIndex': candidate.sdpMLineIndex,
           'sdpMid': candidate.sdpMid,
           'candidate': candidate.candidate,
@@ -86,66 +74,56 @@ class CameraViewState extends State<CameraView> {
       _localPc.addTrack(track, localStream);
     });
 
-    update();
+    if (mounted) setState(() {});
   }
 
   //--------------------------------------------------------------------------//
   Future<void> _startSocketHandler() async {
-    _socketServer = Server();
-    _socketServer.on('connection', (client) async {
+    _server = Server();
+    _server.on('connection', (client) async {
       _socket = client;
       if (_socket != null) {
-        RTCSessionDescription desc = await _localPc.createOffer(oaConstraints);
+        RTCSessionDescription desc = await _localPc.createOffer(offerConstraints);
         await _localPc.setLocalDescription(desc);
-        _sendSocket("signal", "offer", desc.sdp);
+        _sendSocket(_socket, 'signal', 'offer', desc.sdp);
       }
 
-      _socket!.on('msg', (data) {
+      _socket?.on('msg', (data) async {
         final msg = jsonDecode(data);
-        if (msg["command"] == "signal") {
-          socketDataHandler(data);
+        if (msg['command'] == 'signal') {
+          if (msg['type'] == 'answer') {
+            try {
+              await _localPc.setRemoteDescription(RTCSessionDescription(msg['data'], msg['type']));
+            } catch (e) {
+              print(e);
+            }
+          } else if (msg['type'] == 'candidate') {
+            final data = msg['data'];
+            RTCIceCandidate candidate =
+                RTCIceCandidate(data['candidate'], data['sdpMid'], data['sdpMLineIndex']);
+            try {
+              await _localPc.addCandidate(candidate);
+            } catch (e) {
+              print(e);
+            }
+          }
         }
       });
     });
-    _socketServer.listen(4001);
+
+    _server.listen(4001);
   }
 
   //--------------------------------------------------------------------------//
-  void _sendSocket(command, event, data) {
-    var request = {};
-    request["command"] = command;
-    request["type"] = event;
-    request["data"] = data;
-    if (_socket != null) {
-      _socket!.emit("msg", jsonEncode(request).toString());
-    }
-  }
-
-  //--------------------------------------------------------------------------//
-  void socketDataHandler(String data) async {
-    final msg = jsonDecode(data);
-
-    if (msg["type"] == "offer") {
-      // Предложения о подключении от клиентов игнорируем,
-      // так как это сервер и сервер рассылает предложения
-    } else if (msg["type"] == "answer") {
-      // Поличили ответ на предложение (offer)
-      try {
-        await _localPc.setRemoteDescription(RTCSessionDescription(msg["data"], msg["type"]));
-      } catch (e) {
-        print(e);
-      }
-    } else if (msg["type"] == "candidate") {
-      print('Получили сообщение от кандидата ======================================');
-      final can1 = msg["data"];
-      RTCIceCandidate candidate =
-          RTCIceCandidate(can1["candidate"], can1["sdpMid"], can1["sdpMLineIndex"]);
-      try {
-        await _localPc.addCandidate(candidate);
-      } catch (e) {
-        print(e);
-      }
-    }
+  void _sendSocket(Socket? socket, String command, String event, dynamic data) {
+    _socket?.emit(
+      'msg',
+      jsonEncode(<String, dynamic>{
+        'command': command,
+        'type': event,
+        'data': data,
+      }),
+    );
   }
 
   //--------------------------------------------------------------------------//

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'views/main_view.dart';
+import 'views/client_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -8,7 +7,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.pink,
         ),
-        home: const MainView(),
+        home: const ClientView(),
       ),
     );
   }
