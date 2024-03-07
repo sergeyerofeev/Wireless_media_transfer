@@ -1,0 +1,5 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto
+
+/linux/* linguist-vendored
+/windows/* linguist-vendored

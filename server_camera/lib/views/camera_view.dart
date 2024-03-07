@@ -16,6 +16,7 @@ class CameraView extends StatefulWidget {
 class CameraViewState extends State<CameraView> {
   final RTCVideoRenderer _localVideoRenderer = RTCVideoRenderer();
   late final RTCPeerConnection _localPc;
+  late final RTCDataChannel _dataChannel;
 
   late final Server _server;
   Socket? _socket;
@@ -31,6 +32,7 @@ class CameraViewState extends State<CameraView> {
   @override
   void dispose() async {
     await _localVideoRenderer.dispose();
+    await _dataChannel.close();
     super.dispose();
   }
 
@@ -68,11 +70,19 @@ class CameraViewState extends State<CameraView> {
       });
     };
 
+    _localPc.onDataChannel = (channel) {
+      channel.onMessage = (data) {
+        print('Получили сообщение с клиента ${data.text} ++++++++++++++++++++++++++++++++++++');
+      };
+    };
+
     final localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     _localVideoRenderer.srcObject = localStream;
     localStream.getTracks().forEach((track) {
       _localPc.addTrack(track, localStream);
     });
+
+    _dataChannel = await _localPc.createDataChannel('data', RTCDataChannelInit());
 
     if (mounted) setState(() {});
   }
@@ -80,12 +90,13 @@ class CameraViewState extends State<CameraView> {
   //--------------------------------------------------------------------------//
   Future<void> _startSocketHandler() async {
     _server = Server();
+
     _server.on('connection', (client) async {
       _socket = client;
       if (_socket != null) {
-        RTCSessionDescription desc = await _localPc.createOffer(offerConstraints);
-        await _localPc.setLocalDescription(desc);
-        _sendSocket(_socket, 'signal', 'offer', desc.sdp);
+        RTCSessionDescription sessionDescription = await _localPc.createOffer(offerConstraints);
+        await _localPc.setLocalDescription(sessionDescription);
+        _sendSocket(_socket, 'signal', 'offer', sessionDescription.sdp);
       }
 
       _socket?.on('msg', (data) async {
@@ -131,10 +142,22 @@ class CameraViewState extends State<CameraView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          RTCVideoView(_localVideoRenderer),
-        ],
+      body: SafeArea(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // RTCVideoView(_localVideoRenderer),
+            Positioned(
+              top: 10,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _dataChannel.send(RTCDataChannelMessage('Hello client'));
+                },
+                child: const Text('Отправить клиенту'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -15,7 +15,27 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.pink,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor: const MaterialStatePropertyAll<Color>(Colors.black),
+              foregroundColor: const MaterialStatePropertyAll<Color>(Colors.white),
+              surfaceTintColor: const MaterialStatePropertyAll<Color>(Colors.black),
+              padding: MaterialStateProperty.all(const EdgeInsets.all(15.0)),
+              side: MaterialStateProperty.all(
+                const BorderSide(color: Colors.white, width: 2),
+              ),
+              shape: MaterialStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3.0),
+                ),
+              ),
+              overlayColor: MaterialStateProperty.resolveWith(
+                (states) {
+                  return states.contains(MaterialState.pressed) ? Colors.grey : Colors.black;
+                },
+              ),
+            ),
+          ),
         ),
         home: const CameraView(),
       ),

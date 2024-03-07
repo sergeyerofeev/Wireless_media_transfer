@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../settings/constraints.dart';
@@ -14,6 +16,7 @@ class ClientView extends StatefulWidget {
 class ClientViewState extends State<ClientView> {
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   late final RTCPeerConnection _remotePc;
+  late final RTCDataChannel _dataChannel;
   Socket? _socket;
 
   //--------------------------------------------------------------------------//
@@ -27,6 +30,7 @@ class ClientViewState extends State<ClientView> {
   @override
   void dispose() async {
     await _remoteVideoRenderer.dispose();
+    await _dataChannel.close();
 
     _remotePc.close();
     _remotePc.dispose();
@@ -44,41 +48,6 @@ class ClientViewState extends State<ClientView> {
     // Используем заранее известный адрес сервера
     String serverip = 'http://192.168.1.38:4001';
     await _startClientSocket(serverip);
-  }
-
-  //--------------------------------------------------------------------------//
-  Future<void> _startClientSocket(String serverip) async {
-    _socket = io(
-      serverip,
-      OptionBuilder().setTransports(['websocket']).disableAutoConnect().enableMultiplex().build(),
-    );
-
-    _socket?.on('msg', (data) async {
-      final msg = jsonDecode(data);
-
-      if (msg['command'] == 'signal') {
-        if (msg['type'] == 'offer') {
-          try {
-            await _remotePc.setRemoteDescription(RTCSessionDescription(msg['data'], msg['type']));
-            RTCSessionDescription desc = await _remotePc.createAnswer();
-            await _remotePc.setLocalDescription(desc);
-            _sendSocket(_socket, 'signal', 'answer', desc.sdp);
-          } catch (e) {
-            print(e);
-          }
-        } else if (msg['type'] == 'candidate') {
-          final can1 = msg['data'];
-          RTCIceCandidate candidate =
-              RTCIceCandidate(can1['candidate'], can1['sdpMid'], can1['sdpMLineIndex']);
-          try {
-            await _remotePc.addCandidate(candidate);
-          } catch (e) {
-            print(e);
-          }
-        }
-      }
-    });
-    _socket?.connect();
   }
 
   //--------------------------------------------------------------------------//
@@ -115,6 +84,49 @@ class ClientViewState extends State<ClientView> {
         _remoteVideoRenderer.srcObject = event.streams.first;
       }
     };
+
+    _remotePc.onDataChannel = (channel) {
+      channel.onMessage = (data) {
+        print('Получили сообщение с сервера ${data.text} ++++++++++++++++++++++++++++++++++++');
+      };
+    };
+
+    _dataChannel = await _remotePc.createDataChannel('data', RTCDataChannelInit());
+  }
+
+  //--------------------------------------------------------------------------//
+  Future<void> _startClientSocket(String serverip) async {
+    _socket = io(
+      serverip,
+      OptionBuilder().setTransports(['websocket']).disableAutoConnect().enableMultiplex().build(),
+    );
+
+    _socket?.on('msg', (data) async {
+      final msg = jsonDecode(data);
+
+      if (msg['command'] == 'signal') {
+        if (msg['type'] == 'offer') {
+          try {
+            await _remotePc.setRemoteDescription(RTCSessionDescription(msg['data'], msg['type']));
+            RTCSessionDescription sessionDescription = await _remotePc.createAnswer();
+            await _remotePc.setLocalDescription(sessionDescription);
+            _sendSocket(_socket, 'signal', 'answer', sessionDescription.sdp);
+          } catch (e) {
+            print(e);
+          }
+        } else if (msg['type'] == 'candidate') {
+          final data = msg['data'];
+          RTCIceCandidate candidate =
+              RTCIceCandidate(data['candidate'], data['sdpMid'], data['sdpMLineIndex']);
+          try {
+            await _remotePc.addCandidate(candidate);
+          } catch (e) {
+            print(e);
+          }
+        }
+      }
+    });
+    _socket?.connect();
   }
 
   //--------------------------------------------------------------------------//
@@ -135,8 +147,23 @@ class ClientViewState extends State<ClientView> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
+        alignment: Alignment.center,
         children: [
-          RTCVideoView(_remoteVideoRenderer),
+          RTCVideoView(
+            _remoteVideoRenderer,
+            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            //mirror: false,
+            filterQuality: FilterQuality.high,
+          ),
+          Positioned(
+            top: 10,
+            child: ElevatedButton(
+              onPressed: () async {
+                await _dataChannel.send(RTCDataChannelMessage('Hello server'));
+              },
+              child: const Text('Отправить серверу'),
+            ),
+          ),
         ],
       ),
     );

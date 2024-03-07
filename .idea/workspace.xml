@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8b4bd280-8d71-42bc-bd03-3506a3fcb8b1" name="Changes" comment="creating project">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="8b4bd280-8d71-42bc-bd03-3506a3fcb8b1" name="Changes" comment="refactoring a project">
+      <change afterPath="$PROJECT_DIR$/client_controller/.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server_camera/.gitattributes" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/lib/components/cam_panel.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/lib/helpers/constants.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/client_controller/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/lib/views/main_view.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_camera/lib/helpers/constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/server_camera/lib/settings/constraints.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_controller/lib/views/client_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/lib/views/client_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_controller/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_controller/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server_camera/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/server_camera/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server_camera/lib/views/camera_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/server_camera/lib/views/camera_view.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,24 +40,31 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2d7dVLIfIfNIS0GYvK19NZuun0a" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/FlutterProject/Wireless_media_transfer&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "D:/FlutterProject/Wireless_media_transfer/server_camera",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\FlutterProject\Wireless_media_transfer\server_camera" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -66,6 +74,14 @@
       <option name="presentableId" value="Default" />
       <updated>1709363072587</updated>
     </task>
+    <task id="LOCAL-00001" summary="refactoring a project">
+      <created>1709558136684</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1709558136684</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -84,6 +100,7 @@
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
     <MESSAGE value="creating project" />
-    <option name="LAST_COMMIT_MESSAGE" value="creating project" />
+    <MESSAGE value="refactoring a project" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactoring a project" />
   </component>
 </project>
