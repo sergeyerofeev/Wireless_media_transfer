@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:socket_io_client/socket_io_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:socket_io_client/socket_io_client.dart';
+
 import '../settings/constraints.dart';
 
 class ClientView extends StatefulWidget {
@@ -16,7 +16,10 @@ class ClientView extends StatefulWidget {
 class ClientViewState extends State<ClientView> {
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   late final RTCPeerConnection _remotePc;
+
   late final RTCDataChannel _dataChannel;
+  bool _statusTorch = false; // Подсветка выключена
+  double _zoomValue = 1.0;
   Socket? _socket;
 
   //--------------------------------------------------------------------------//
@@ -87,7 +90,7 @@ class ClientViewState extends State<ClientView> {
 
     _remotePc.onDataChannel = (channel) {
       channel.onMessage = (data) {
-        print('Получили сообщение с сервера ${data.text} ++++++++++++++++++++++++++++++++++++');
+        debugPrint('Получили сообщение с сервера ${data.text} ++++++++++++++++++++++++++++++++++++');
       };
     };
 
@@ -112,7 +115,7 @@ class ClientViewState extends State<ClientView> {
             await _remotePc.setLocalDescription(sessionDescription);
             _sendSocket(_socket, 'signal', 'answer', sessionDescription.sdp);
           } catch (e) {
-            print(e);
+            debugPrint('$e');
           }
         } else if (msg['type'] == 'candidate') {
           final data = msg['data'];
@@ -121,7 +124,7 @@ class ClientViewState extends State<ClientView> {
           try {
             await _remotePc.addCandidate(candidate);
           } catch (e) {
-            print(e);
+            debugPrint('$e');
           }
         }
       }
@@ -153,15 +156,43 @@ class ClientViewState extends State<ClientView> {
             _remoteVideoRenderer,
             objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             //mirror: false,
-            filterQuality: FilterQuality.high,
+            filterQuality: FilterQuality.low,
           ),
           Positioned(
             top: 10,
-            child: ElevatedButton(
-              onPressed: () async {
-                await _dataChannel.send(RTCDataChannelMessage('Hello server'));
-              },
-              child: const Text('Отправить серверу'),
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await _dataChannel.send(RTCDataChannelMessage('torch'));
+                    _statusTorch ^= true;
+                    setState(() {});
+                  },
+                  child: Icon(_statusTorch ? Icons.flash_off : Icons.flash_on),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  onPressed: (_zoomValue < 4.0)
+                      ? () async {
+                          _zoomValue += 1.0;
+                          await _dataChannel.send(RTCDataChannelMessage('zoom $_zoomValue'));
+                          setState(() {});
+                        }
+                      : null,
+                  child: const Icon(Icons.zoom_in),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: (_zoomValue > 1.0)
+                      ? () async {
+                          _zoomValue -= 1.0;
+                          await _dataChannel.send(RTCDataChannelMessage('zoom $_zoomValue'));
+                          setState(() {});
+                        }
+                      : null,
+                  child: const Icon(Icons.zoom_out),
+                ),
+              ],
             ),
           ),
         ],

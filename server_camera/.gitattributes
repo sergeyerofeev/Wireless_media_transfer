@@ -2,3 +2,5 @@
 * text=auto
 
 /android/* linguist-vendored
+
+*.cpp linguist-language=Dart

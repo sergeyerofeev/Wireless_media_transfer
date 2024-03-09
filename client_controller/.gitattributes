@@ -3,3 +3,5 @@
 
 /linux/* linguist-vendored
 /windows/* linguist-vendored
+
+*.cpp linguist-language=Dart
