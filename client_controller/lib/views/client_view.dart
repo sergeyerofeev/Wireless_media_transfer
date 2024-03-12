@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
+import '../gamepad/gamepad_widget.dart';
 import '../settings/constraints.dart';
 
 class ClientView extends StatefulWidget {
@@ -171,6 +172,7 @@ class ClientViewState extends State<ClientView> {
                   child: Icon(_statusTorch ? Icons.flash_off : Icons.flash_on),
                 ),
                 const SizedBox(width: 30),
+                GamepadWidget(dataChannel: _dataChannel),
                 ElevatedButton(
                   onPressed: (_zoomValue < 4.0)
                       ? () async {

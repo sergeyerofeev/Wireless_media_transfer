@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8b4bd280-8d71-42bc-bd03-3506a3fcb8b1" name="Changes" comment="Added RTCDataChannel">
+    <list default="true" id="8b4bd280-8d71-42bc-bd03-3506a3fcb8b1" name="Changes" comment="Added torch and zoom">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/.gitattributes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/lib/settings/constraints.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/lib/settings/constraints.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_controller/lib/views/client_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/client_controller/lib/views/client_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_camera/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/server_camera/.gitattributes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_camera/lib/views/camera_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/server_camera/lib/views/camera_view.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +80,14 @@
       <option name="project" value="LOCAL" />
       <updated>1709823075966</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added torch and zoom">
+      <created>1710016885311</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1710016885311</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -106,6 +108,7 @@
     <MESSAGE value="creating project" />
     <MESSAGE value="refactoring a project" />
     <MESSAGE value="Added RTCDataChannel" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added RTCDataChannel" />
+    <MESSAGE value="Added torch and zoom" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added torch and zoom" />
   </component>
 </project>
